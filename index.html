@@ -25,7 +25,7 @@
             const date = new Date().toLocaleString();
             const content = `- ${date}: ${sentence}\n`;
 
-            fetch('https://api.github.com/repos/{你的用户名}/{你的仓库名}/contents/sentences.txt', {
+            fetch('https://api.github.com/repos/Hasook/new/contents/sentences.txt', {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Bearer {你的GitHub访问令牌}'
@@ -35,7 +35,7 @@
             .then(data => {
                 const sha = data.sha;
 
-                fetch('https://api.github.com/repos/{你的用户名}/{你的仓库名}/contents/sentences.txt', {
+                fetch('https://api.github.com/repos/Hasook/new/contents/sentences.txt', {
                     method: 'PUT',
                     headers: {
                         'Authorization': 'Bearer {你的GitHub访问令牌}',
@@ -56,7 +56,7 @@
 
         // 定义一个函数，用于从GitHub仓库获取所有句子并显示在列表中
         function getSentences() {
-            fetch('https://api.github.com/repos/{你的用户名}/{你的仓库名}/contents/sentences.txt', {
+            fetch('https://api.github.com/repos/Hasook/new/contents/sentences.txt', {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Bearer {你的GitHub访问令牌}'
