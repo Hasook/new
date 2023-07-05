@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>实时共享记录句子</title>
+</head>
+<body>
+    <h1>实时共享记录句子</h1>
+
+    <form id="sentence-form">
+        <input type="text" id="sentence-input" placeholder="输入句子">
+        <button type="submit">提交</button>
+    </form>
+
+    <ul id="sentence-list">
+        <!-- 这里将显示已记录的句子 -->
+    </ul>
+
+    <script>
+        const form = document.getElementById('sentence-form');
+        const input = document.getElementById('sentence-input');
+        const list = document.getElementById('sentence-list');
+
+        // 定义一个函数，用于向GitHub仓库提交句子
+        function saveSentence(sentence) {
+            const date = new Date().toLocaleString();
+            const content = `- ${date}: ${sentence}\n`;
+
+            fetch('https://api.github.com/repos/{你的用户名}/{你的仓库名}/contents/sentences.txt', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer {你的GitHub访问令牌}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const sha = data.sha;
+
+                fetch('https://api.github.com/repos/{你的用户名}/{你的仓库名}/contents/sentences.txt', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer {你的GitHub访问令牌}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: '新增句子',
+                        content: btoa(content),
+                        sha: sha
+                    })
+                })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error(error));
+            })
+            .catch(error => console.error(error));
+        }
+
+        // 定义一个函数，用于从GitHub仓库获取所有句子并显示在列表中
+        function getSentences() {
+            fetch('https://api.github.com/repos/{你的用户名}/{你的仓库名}/contents/sentences.txt', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer {你的GitHub访问令牌}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const content = atob(data.content);
+                const sentences = content.split('\n').filter(sentence => sentence.trim() !== '');
+
+                sentences.forEach(sentence => {
+                    const listItem = document.createElement('li');
+                    listItem.innerText = sentence;
+                    list.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error(error));
+        }
+
+        // 当表单提交时执行的函数
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const sentence = input.value;
+            saveSentence(sentence);
+
+            const listItem = document.createElement('li');
+            listItem.innerText = sentence;
+            list.appendChild(listItem);
+
+            input.value = '';
+        });
+
+        // 页面加载时获取所有句子
+        getSentences();
+    </script>
+</body>
+</html>
